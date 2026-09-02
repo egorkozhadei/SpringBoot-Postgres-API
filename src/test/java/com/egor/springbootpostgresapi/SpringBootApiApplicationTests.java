@@ -1,10 +1,10 @@
-package com.egor.postgres;
+package com.egor.springbootpostgresapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PostgresApplicationTests {
+class SpringBootApiApplicationTests {
 
 	@Test
 	void contextLoads() {
