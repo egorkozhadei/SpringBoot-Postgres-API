@@ -4,6 +4,8 @@ import com.egor.springbootpostgresapi.domain.dto.AuthorDto;
 import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
 import com.egor.springbootpostgresapi.mappers.Mapper;
 import com.egor.springbootpostgresapi.services.AuthorService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,9 +22,9 @@ public class AuthorController {
     }
 
     @PostMapping(path = "/authors")
-    public AuthorDto createAuthor(@RequestBody AuthorDto authorDto) {
+    public ResponseEntity<AuthorDto> createAuthor(@RequestBody AuthorDto authorDto) {
         AuthorEntity authorEntity = authorMapper.mapFrom(authorDto);
         AuthorEntity savedAuthorEntity = authorService.createAuthor(authorEntity);
-        return authorMapper.mapTo(savedAuthorEntity);
+        return new ResponseEntity<>(authorMapper.mapTo(savedAuthorEntity), HttpStatus.CREATED);
     }
 }

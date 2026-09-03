@@ -9,7 +9,7 @@ public final class TestDataUtil {
 
     public static AuthorEntity getTestAuthorA() {
         return AuthorEntity.builder()
-                .name("Abigail Blake")
+                .name("Abigail Rose")
                 .age(80)
                 .build();
     }
