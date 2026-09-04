@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import tools.jackson.databind.ObjectMapper;
 
+import java.text.MessageFormat;
+
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -91,6 +93,45 @@ public class AuthorControllerIntegrationTest {
                 MockMvcResultMatchers.jsonPath("$[0].name").value("Abigail Rose")
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].age").value(80)
+        );
+    }
+
+    @Test
+    public void testThatGetAuthorReturnsHttpStatus200WhenExists() throws Exception {
+        AuthorEntity author = TestDataUtil.getTestAuthorA();
+        AuthorEntity savedAuthor = authorService.createAuthor(author);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(MessageFormat.format("/authors/{0}", savedAuthor.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatGetAuthorReturnsHttpStatus404WhenNotExists() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void testThatGetAuthorReturnsAuthorWhenExists() throws Exception {
+        AuthorEntity author = TestDataUtil.getTestAuthorA();
+        AuthorEntity savedAuthor = authorService.createAuthor(author);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(MessageFormat.format("/authors/{0}", savedAuthor.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.status().isOk()
+        )
+        .andExpect(
+            MockMvcResultMatchers.jsonPath("$.id").isNumber()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.name").value("Abigail Rose")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.age").value(80)
         );
     }
 }
