@@ -3,6 +3,7 @@ package com.egor.springbootpostgresapi.controllers;
 import com.egor.springbootpostgresapi.TestDataUtil;
 import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
 import com.egor.springbootpostgresapi.domain.entities.BookEntity;
+import com.egor.springbootpostgresapi.services.BookService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,13 @@ import java.text.MessageFormat;
 public class BookControllerIntegrationTests {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+    private BookService bookService;
 
     @Autowired
-    public BookControllerIntegrationTests(MockMvc mockMvc) {
+    public BookControllerIntegrationTests(MockMvc mockMvc, BookService bookService) {
         this.mockMvc = mockMvc;
         this.objectMapper = new ObjectMapper();
+        this.bookService = bookService;
     }
 
     @Test
@@ -62,5 +65,33 @@ public class BookControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.author").isEmpty()
         );
+    }
+
+    @Test
+    public void testThatListBooksReturnsHttpStatus200() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatListBooksReturnsListOfBooks() throws Exception {
+        BookEntity book = TestDataUtil.getTestBookA(null);
+        bookService.createBook(book.getIsbn(), book);
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/books")
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(
+                        MockMvcResultMatchers.status().isOk()
+                )
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].isbn").value("978-1-2345-6789-0")
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].title").value("The Shadow in the Attic")
+                ).andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].author").isEmpty()
+                );
     }
 }
