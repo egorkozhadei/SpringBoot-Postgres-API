@@ -1,5 +1,7 @@
 package com.egor.springbootpostgresapi;
 
+import com.egor.springbootpostgresapi.domain.dto.AuthorDto;
+import com.egor.springbootpostgresapi.domain.dto.BookDto;
 import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
 import com.egor.springbootpostgresapi.domain.entities.BookEntity;
 
@@ -14,6 +16,14 @@ public final class TestDataUtil {
                 .build();
     }
 
+    public static AuthorDto getTestAuthorDtoA() {
+        return AuthorDto.builder()
+                .name("Abigail Rose")
+                .age(80)
+                .id(1L)
+                .build();
+    }
+
     public static AuthorEntity getTestAuthorB() {
         return AuthorEntity.builder()
                 .name("Thomas Green")
@@ -25,6 +35,14 @@ public final class TestDataUtil {
         return AuthorEntity.builder()
                 .name("Jessee Casey")
                 .age(24)
+                .build();
+    }
+
+    public static BookDto getTestBookDtoA(final AuthorDto authorEntity) {
+        return BookDto.builder()
+                .isbn("978-1-2345-6789-0")
+                .title("The Shadow in the Attic")
+                .author(authorEntity)
                 .build();
     }
 

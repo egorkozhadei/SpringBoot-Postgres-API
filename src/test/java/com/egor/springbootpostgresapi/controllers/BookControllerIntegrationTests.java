@@ -1,7 +1,7 @@
 package com.egor.springbootpostgresapi.controllers;
 
 import com.egor.springbootpostgresapi.TestDataUtil;
-import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
+import com.egor.springbootpostgresapi.domain.dto.BookDto;
 import com.egor.springbootpostgresapi.domain.entities.BookEntity;
 import com.egor.springbootpostgresapi.services.BookService;
 import org.junit.jupiter.api.Test;
@@ -78,20 +78,84 @@ public class BookControllerIntegrationTests {
     @Test
     public void testThatListBooksReturnsListOfBooks() throws Exception {
         BookEntity book = TestDataUtil.getTestBookA(null);
-        bookService.createBook(book.getIsbn(), book);
+        bookService.createOrUpdateBook(book.getIsbn(), book);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/books")
-                                .contentType(MediaType.APPLICATION_JSON)
-                ).andExpect(
-                        MockMvcResultMatchers.status().isOk()
-                )
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].isbn").value("978-1-2345-6789-0")
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].title").value("The Shadow in the Attic")
-                ).andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].author").isEmpty()
-                );
+                MockMvcRequestBuilders.get("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        )
+        .andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].isbn").value("978-1-2345-6789-0")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].title").value("The Shadow in the Attic")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].author").isEmpty()
+        );
+    }
+
+    @Test
+    public void testThatGetBookReturnsHttpStatus200WhenBookExists() throws Exception {
+        BookEntity book = TestDataUtil.getTestBookA(null);
+        bookService.createOrUpdateBook(book.getIsbn(), book);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/books/" + book.getIsbn())
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatGetBookReturnsHttpStatus404WhenBookDoesntExist() throws Exception {
+        BookEntity book = TestDataUtil.getTestBookA(null);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/books/" + book.getIsbn())
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void testThatUpdateBookSuccessfullyReturnsHttp200OK() throws Exception {
+        BookEntity book = TestDataUtil.getTestBookA(null);
+        BookEntity savedBook = bookService.createOrUpdateBook(book.getIsbn(), book);
+
+        BookDto bookDto = TestDataUtil.getTestBookDtoA(null);
+        bookDto.setIsbn(savedBook.getIsbn());
+        String bookJson = objectMapper.writeValueAsString(bookDto);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put(MessageFormat.format("/books/{0}", savedBook.getIsbn()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        );
+    }
+
+    @Test
+    public void testThatUpdateBookReturnsUpdatedBook() throws Exception {
+        BookEntity book = TestDataUtil.getTestBookA(null);
+        BookEntity savedBook = bookService.createOrUpdateBook(book.getIsbn(), book);
+
+        BookDto bookDto = TestDataUtil.getTestBookDtoA(null);
+        bookDto.setIsbn(savedBook.getIsbn());
+        bookDto.setTitle("Updated");
+        String bookJson = objectMapper.writeValueAsString(bookDto);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put(MessageFormat.format("/books/{0}", savedBook.getIsbn()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.isbn").value(bookDto.getIsbn())
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.title").value(bookDto.getTitle())
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.author").isEmpty()
+        );
     }
 }
