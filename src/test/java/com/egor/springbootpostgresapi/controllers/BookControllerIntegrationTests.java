@@ -2,6 +2,7 @@ package com.egor.springbootpostgresapi.controllers;
 
 import com.egor.springbootpostgresapi.TestDataUtil;
 import com.egor.springbootpostgresapi.domain.dto.BookDto;
+import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
 import com.egor.springbootpostgresapi.domain.entities.BookEntity;
 import com.egor.springbootpostgresapi.services.BookService;
 import org.junit.jupiter.api.Test;
@@ -213,5 +214,24 @@ public class BookControllerIntegrationTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.author").isEmpty()
         );
+    }
+
+    @Test
+    public void testThatDeleteBookReturnsHttp204WhenNoBookExists() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/books/978-0-13-478627-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    public void testThatDeleteBookReturnsHttp204WhenBookExists() throws Exception {
+        BookEntity book = TestDataUtil.getTestBookA(null);
+        BookEntity savedBook = bookService.createOrUpdateBook(book.getIsbn(), book);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/books/" + savedBook.getIsbn())
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }
