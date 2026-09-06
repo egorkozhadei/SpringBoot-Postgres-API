@@ -80,20 +80,20 @@ public class AuthorControllerIntegrationTest {
     @Test
     public void testThatListAuthorsReturnsListOfAuthors() throws Exception {
         AuthorEntity author = TestDataUtil.getTestAuthorA();
-        authorService.save(author);
+        AuthorEntity saved = authorService.save(author);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/authors")
+                MockMvcRequestBuilders.get("/authors?size=1")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
             MockMvcResultMatchers.status().isOk()
         )
         .andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+                MockMvcResultMatchers.jsonPath("$.content[0].id").value(saved.getId())
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].name").value("Abigail Rose")
+                MockMvcResultMatchers.jsonPath("$.content[0].name").value("Abigail Rose")
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].age").value(80)
+                MockMvcResultMatchers.jsonPath("$.content[0].age").value(80)
         );
     }
 

@@ -2,13 +2,14 @@ package com.egor.springbootpostgresapi.services;
 
 import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import java.util.Optional;
 
 public interface AuthorService {
     AuthorEntity save(AuthorEntity authorEntity);
 
-    List<AuthorEntity> findAll();
+    Page<AuthorEntity> findAll(Pageable pageable);
 
     Optional<AuthorEntity> findOne(Long id);
 

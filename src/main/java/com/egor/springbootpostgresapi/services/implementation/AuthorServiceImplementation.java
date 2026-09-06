@@ -3,9 +3,9 @@ package com.egor.springbootpostgresapi.services.implementation;
 import com.egor.springbootpostgresapi.domain.entities.AuthorEntity;
 import com.egor.springbootpostgresapi.repositories.AuthorRepository;
 import com.egor.springbootpostgresapi.services.AuthorService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -24,8 +24,8 @@ public class AuthorServiceImplementation implements AuthorService {
     }
 
     @Override
-    public List<AuthorEntity> findAll() {
-        return StreamSupport.stream(authorRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    public Page<AuthorEntity> findAll(Pageable pageable) {
+        return authorRepository.findAll(pageable);
     }
 
     @Override

@@ -4,11 +4,10 @@ import com.egor.springbootpostgresapi.domain.entities.BookEntity;
 import com.egor.springbootpostgresapi.repositories.BookRepository;
 import com.egor.springbootpostgresapi.services.BookService;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class BookServiceImplementation implements BookService {
@@ -25,8 +24,8 @@ public class BookServiceImplementation implements BookService {
     }
 
     @Override
-    public List<BookEntity> findAll() {
-        return StreamSupport.stream(bookRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    public Page<BookEntity> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable);
     }
 
     @Override
